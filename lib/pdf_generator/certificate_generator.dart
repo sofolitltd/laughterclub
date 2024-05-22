@@ -1,82 +1,83 @@
-// import 'dart:convert';
-// import 'dart:html';
-//
-// import 'package:flutter/services.dart';
-// import 'package:syncfusion_flutter_pdf/pdf.dart';
-//
-// //
-// class PdfGenerator {
-//   //
-//   static Future<void> createCertificate(String name) async {
-//     //Create a PDF document.
-//     final PdfDocument document = PdfDocument();
-//     document.pageSettings.margins.all = 0;
-//     document.pageSettings = PdfPageSettings(
-//       PdfPageSize.a4,
-//       PdfPageOrientation.landscape,
-//     );
-//
-//     //Add page to the PDF
-//     final PdfPage page = document.pages.add();
-//
-//     //Get the page size
-//     final Size pageSize = page.getClientSize();
-//
-//     //Draw image
-//     page.graphics.drawImage(
-//         PdfBitmap(await _readImageData('basic_counseling.png')),
-//         Rect.fromLTWH(0, 0, pageSize.width, pageSize.height));
-//
-//     //Create font
-//     final PdfFont nameFont =
-//         await _loadCustomFont('assets/fonts/PinyonScript-Regular.ttf', 48);
-//     // final PdfFont controlFont = PdfStandardFont(PdfFontFamily.helvetica, 19);
-//     // final PdfFont dateFont = PdfStandardFont(PdfFontFamily.helvetica, 16);
-//
-//     //
-//     double x = _calculateXPosition(name, nameFont, pageSize.width);
-//     page.graphics.drawString(name, nameFont,
-//         bounds: Rect.fromLTWH(x, 190, 0, 0),
-//         brush: PdfSolidBrush(PdfColor(20, 58, 86)));
-//
-//     //Save and launch the document
-//     final List<int> bytes = await document.save();
-//     //Dispose the document.
-//     document.dispose();
-//
-//     //Save and launch file.
-//     await _saveAndLaunchFile(bytes, '$name.pdf');
-//   }
-//
-//   static Future<PdfTrueTypeFont> _loadCustomFont(
-//       String path, double size) async {
-//     // Load the font from assets
-//     final ByteData fontData = await rootBundle.load(path);
-//     final Uint8List fontBytes = fontData.buffer.asUint8List();
-//     return PdfTrueTypeFont(fontBytes, size);
-//   }
-//
-// //
-//   static double _calculateXPosition(
-//       String text, PdfFont font, double pageWidth) {
-//     final Size textSize =
-//         font.measureString(text, layoutArea: Size(pageWidth, 0));
-//     return (pageWidth - textSize.width) / 2;
-//   }
-//
-// //
-//   static Future<List<int>> _readImageData(String name) async {
-//     final ByteData data = await rootBundle.load('assets/$name');
-//     return data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-//   }
-//
-//   ///To save the pdf file in the device
-//   static Future<void> _saveAndLaunchFile(
-//       List<int> bytes, String fileName) async {
-//     AnchorElement(
-//         href:
-//             'data:application/octet-stream;charset=utf-16le;base64,${base64.encode(bytes)}')
-//       ..setAttribute('download', fileName)
-//       ..click();
-//   }
-// }
+import 'dart:convert';
+
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:syncfusion_flutter_pdf/pdf.dart';
+import 'package:universal_html/html.dart' as html;
+
+class PdfGenerator {
+  static Future<void> createCertificate(
+      String name, String imageUrl, double position, String type) async {
+    // Create a PDF document.
+    final PdfDocument document = PdfDocument();
+    document.pageSettings.margins.all = 0;
+    document.pageSettings = PdfPageSettings(
+      PdfPageSize.a4,
+      PdfPageOrientation.landscape,
+    );
+
+    // Add page to the PDF
+    final PdfPage page = document.pages.add();
+
+    // Get the page size
+    final Size pageSize = page.getClientSize();
+
+    // Draw image from the internet
+    final Uint8List imageData = await _fetchImageData(imageUrl);
+    page.graphics.drawImage(PdfBitmap(imageData),
+        Rect.fromLTWH(0, 0, pageSize.width, pageSize.height));
+
+    // Create font
+    final PdfFont nameFont =
+        await _loadCustomFont('assets/fonts/PinyonScript-Regular.ttf', 48);
+
+    // Calculate the X position for the name text
+    double x = _calculateXPosition(name, nameFont, pageSize.width);
+    page.graphics.drawString(name, nameFont,
+        bounds: Rect.fromLTWH(x, position, 0, 0),
+        brush: PdfSolidBrush(PdfColor(20, 58, 86)));
+
+    // Save and launch the document
+    final List<int> bytes = await document.save();
+    // Dispose the document
+    document.dispose();
+
+    // Save and launch file
+    await _saveAndLaunchFile(bytes, '$name ($type).pdf');
+  }
+
+  static Future<PdfTrueTypeFont> _loadCustomFont(
+      String path, double size) async {
+    // Load the font from assets
+    final ByteData fontData = await rootBundle.load(path);
+    final Uint8List fontBytes = fontData.buffer.asUint8List();
+    return PdfTrueTypeFont(fontBytes, size);
+  }
+
+  static double _calculateXPosition(
+      String text, PdfFont font, double pageWidth) {
+    final Size textSize =
+        font.measureString(text, layoutArea: Size(pageWidth, 0));
+    return (pageWidth - textSize.width) / 2;
+  }
+
+  static Future<Uint8List> _fetchImageData(String url) async {
+    final http.Response response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      return response.bodyBytes;
+    } else {
+      throw Exception('Failed to load image');
+    }
+  }
+
+  /// To save the pdf file in the device
+  static Future<void> _saveAndLaunchFile(
+      List<int> bytes, String fileName) async {
+    final base64data = base64.encode(bytes);
+    final url = 'data:application/octet-stream;base64,$base64data';
+
+    final html.AnchorElement anchor = html.AnchorElement(href: url)
+      ..setAttribute('download', fileName)
+      ..click();
+  }
+}

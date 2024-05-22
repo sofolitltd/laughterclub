@@ -7,11 +7,22 @@ import 'package:url_launcher/url_launcher.dart';
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Profile'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context),
+          ),
+        ],
       ),
       body: (FirebaseAuth.instance.currentUser == null)
           ? Center(
@@ -158,12 +169,8 @@ class TrainingDetailScreen extends StatelessWidget {
         child: Container(
           constraints: const BoxConstraints(maxWidth: 1080),
           padding: MediaQuery.of(context).size.width > 700
-              ? const EdgeInsets.symmetric(
-                  horizontal: 100,
-                )
-              : const EdgeInsets.symmetric(
-                  horizontal: 16,
-                ),
+              ? const EdgeInsets.symmetric(horizontal: 100)
+              : const EdgeInsets.symmetric(horizontal: 16),
           child: Align(
             alignment: Alignment.topCenter,
             child: SingleChildScrollView(

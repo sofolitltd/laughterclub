@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:laughterclub/pdf_generator/add_screen.dart';
 import 'package:laughterclub/screen/login_screen.dart';
 import 'package:laughterclub/screen/profile_screen.dart';
 import 'package:laughterclub/screen/register_screen.dart';
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(8),
             ),
             minimumSize: const Size(48, 48),
-            backgroundColor: Colors.amberAccent,
+            // backgroundColor: Colors.amberAccent,
             elevation: 2,
             textStyle: const TextStyle(
               fontWeight: FontWeight.bold,
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => const HomeScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/admin': (context) => const AdminLoginScreen(),
+        '/add': (context) => const AddScreen(),
         // '/payment': (context) => const PaymentScreen(),
         // '/member': (context) => const TrainingMemberScreen(),
         '/login': (context) => const LoginScreen(),
