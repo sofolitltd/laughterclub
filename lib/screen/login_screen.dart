@@ -44,8 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         if (userCredential.user != null) {
-          Navigator.pushNamedAndRemoveUntil(
-              context, route ?? '/', (route) => false);
+          Navigator.pushNamedAndRemoveUntil(context, route!, (route) => false);
         }
       } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
