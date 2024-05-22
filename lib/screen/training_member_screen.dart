@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:laughterclub/pdf_generator/certificate_generator.dart';
 
 class TrainingMemberScreen extends StatefulWidget {
   const TrainingMemberScreen({super.key});
@@ -20,7 +19,7 @@ class _TrainingMemberScreenState extends State<TrainingMemberScreen> {
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('training')
+            .collection('payments')
             .where('payment.status', isEqualTo: 'Completed')
             .snapshots(),
         builder: (context, snapshot) {
@@ -55,40 +54,41 @@ class _TrainingMemberScreenState extends State<TrainingMemberScreen> {
                         child: Text('Total member: ${data.length}'),
                       ),
 
+                      //todo
+                      // ElevatedButton(
+                      //   onPressed: () async {
+                      //     const delay = Duration(milliseconds: 500);
+                      //     setState(() {
+                      //       _isLoading = true;
+                      //     });
                       //
-                      ElevatedButton(
-                        onPressed: () async {
-                          const delay = Duration(milliseconds: 500);
-                          setState(() {
-                            _isLoading = true;
-                          });
-
-                          //
-                          for (var i = 0; i < data.length; i++) {
-                            await Future.delayed(delay);
-
-                            await PdfGenerator.createCertificate(
-                                data[i].get('name'));
-
-                            setState(() {
-                              _isLoading = false;
-                            });
-                          }
-                        },
-                        child: _isLoading
-                            ? const Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  SizedBox(
-                                      height: 24,
-                                      width: 24,
-                                      child: CircularProgressIndicator()),
-                                  SizedBox(width: 8),
-                                  Text('Generating Certificate...'),
-                                ],
-                              )
-                            : const Text('Generate Certificate for All'),
-                      ),
+                      //     //
+                      //     for (var i = 0; i < data.length; i++) {
+                      //       await Future.delayed(delay);
+                      //
+                      //
+                      //       await PdfGenerator.createCertificate(
+                      //           data[i].get('name'));
+                      //
+                      //       setState(() {
+                      //         _isLoading = false;
+                      //       });
+                      //     }
+                      //   },
+                      //   child: _isLoading
+                      //       ? const Row(
+                      //           mainAxisSize: MainAxisSize.min,
+                      //           children: [
+                      //             SizedBox(
+                      //                 height: 24,
+                      //                 width: 24,
+                      //                 child: CircularProgressIndicator()),
+                      //             SizedBox(width: 8),
+                      //             Text('Generating Certificate...'),
+                      //           ],
+                      //         )
+                      //       : const Text('Generate Certificate for All'),
+                      // ),
                     ],
                   ),
 

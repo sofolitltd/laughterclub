@@ -1,6 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:laughterclub/screen/login_screen.dart';
+import 'package:laughterclub/screen/profile_screen.dart';
+import 'package:laughterclub/screen/register_screen.dart';
 
 import '/screen/admin_login_screen.dart';
 import 'firebase_options.dart';
@@ -50,7 +53,12 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => const HomeScreen(),
+        '/profile': (context) => const ProfileScreen(),
         '/admin': (context) => const AdminLoginScreen(),
+        // '/payment': (context) => const PaymentScreen(),
+        // '/member': (context) => const TrainingMemberScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/register': (context) => const RegisterScreen(),
         '/basic-counseling': (context) => const TrainingDetails(index: 0),
         '/advanced-counseling': (context) => const TrainingDetails(index: 1),
         '/cbt': (context) => const TrainingDetails(index: 2),

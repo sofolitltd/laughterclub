@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +14,11 @@ class PaymentScreen extends StatelessWidget {
         title: const Text('Payment Check'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('training').snapshots(),
+        stream: FirebaseFirestore.instance
+            .collection('payments')
+            .where('trainingCode', isEqualTo: 'basic-counseling-2401')
+            // .orderBy('name')
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text('Something wrong'));
@@ -32,16 +38,25 @@ class PaymentScreen extends StatelessWidget {
             child: Container(
               constraints: const BoxConstraints(maxWidth: 1920),
               padding: const EdgeInsets.all(16),
-              child: Scrollbar(
-                thumbVisibility: true,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Scrollbar(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: MyTable(data: data),
+              child: ScrollConfiguration(
+                behavior: ScrollConfiguration.of(context).copyWith(
+                  dragDevices: {
+                    PointerDeviceKind.touch,
+                    PointerDeviceKind.mouse,
+                  },
+                ),
+                child: Scrollbar(
+                  thumbVisibility: true,
+                  child: SingleChildScrollView(
+                    primary: true,
+                    scrollDirection: Axis.horizontal,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: Scrollbar(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: MyTable(data: data),
+                        ),
                       ),
                     ),
                   ),
@@ -199,7 +214,7 @@ class MyTable extends StatelessWidget {
         ),
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
-          child: DeletePayment(itemId: itemData.id),
+          child: DeletePayment(itemData: itemData),
         ),
       ],
     );
@@ -209,10 +224,10 @@ class MyTable extends StatelessWidget {
 class RowItem extends StatefulWidget {
   final QueryDocumentSnapshot itemData;
 
-  const RowItem({Key? key, required this.itemData}) : super(key: key);
+  const RowItem({super.key, required this.itemData});
 
   @override
-  _RowItemState createState() => _RowItemState();
+  State<RowItem> createState() => _RowItemState();
 }
 
 class _RowItemState extends State<RowItem> {
@@ -230,10 +245,29 @@ class _RowItemState extends State<RowItem> {
     });
 
     try {
+      //
       await FirebaseFirestore.instance
-          .collection('training')
+          .collection('payments')
           .doc(widget.itemData.id)
           .update({'payment.status': newStatus});
+
+      //
+      var userRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(widget.itemData.get('uid'));
+
+      if (selectedStatus == 'Completed') {
+        await userRef.update({
+          'training':
+              FieldValue.arrayUnion([widget.itemData.get('trainingCode')]),
+        });
+      } else {
+        //
+        await userRef.update({
+          'training':
+              FieldValue.arrayRemove([widget.itemData.get('trainingCode')]),
+        });
+      }
     } catch (e) {
       print("Failed to update status: $e");
     }
@@ -278,9 +312,9 @@ class _RowItemState extends State<RowItem> {
 
 //
 class DeletePayment extends StatelessWidget {
-  final String itemId;
+  final QueryDocumentSnapshot itemData;
 
-  const DeletePayment({super.key, required this.itemId});
+  const DeletePayment({super.key, required this.itemData});
 
   @override
   Widget build(BuildContext context) {
@@ -314,9 +348,19 @@ class DeletePayment extends StatelessWidget {
         if (confirmDelete) {
           try {
             await FirebaseFirestore.instance
-                .collection('training')
-                .doc(itemId)
+                .collection('payments')
+                .doc(itemData.id)
                 .delete();
+            //
+            var userRef = FirebaseFirestore.instance
+                .collection('users')
+                .doc(itemData.get('uid'));
+            await userRef.update({
+              'training':
+                  FieldValue.arrayRemove([itemData.get('trainingCode')]),
+            });
+
+            //
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Item deleted successfully')),
             );

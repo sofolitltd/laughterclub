@@ -1,9 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 final List trainingList = [
   {
     'title': 'Basic Counseling',
     'route': 'basic-counseling',
+    'trainingCode': 'basic-counseling-2401',
     'image': 'https://via.placeholder.com/150',
     'schedule': [
       '23 May(02:00 pm - 04:30 pm)',
@@ -25,6 +28,7 @@ final List trainingList = [
   {
     'title': 'Advanced Counseling',
     'route': 'advanced-counseling',
+    'trainingCode': 'advanced-counseling-2401',
     'image': 'https://via.placeholder.com/150',
     'schedule': [
       'Currently unavailable',
@@ -39,6 +43,7 @@ final List trainingList = [
   {
     'title': 'CBT (Cognitive Behavior Therapy)',
     'route': 'cbt',
+    'trainingCode': 'cbt-2401',
     'image': 'https://via.placeholder.com/150',
     'schedule': [
       'Currently unavailable',
@@ -73,65 +78,74 @@ class Training extends StatelessWidget {
         //
         SizedBox(
           height: 240,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            separatorBuilder: (context, index) => const SizedBox(width: 16),
-            scrollDirection: Axis.horizontal,
-            itemCount: trainingList.length,
-            itemBuilder: (context, index) {
-              return GestureDetector(
-                onTap: () {
-                  Navigator.pushNamed(
-                    context,
-                    "/${trainingList[index]['route']}",
-                  );
-                },
-                child: Card(
-                  margin: EdgeInsets.zero,
-                  child: Container(
-                    width: 180,
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        //
-                        Expanded(
-                          flex: 6,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: Colors.amber.shade200,
-                              // image: DecorationImage(
-                              //   fit: BoxFit.cover,
-                              //   image: NetworkImage(
-                              //     trainingList[index]['image']!,
-                              //   ),
-                              // ),
+          child: ScrollConfiguration(
+            behavior: ScrollConfiguration.of(context).copyWith(
+              dragDevices: {
+                PointerDeviceKind.touch,
+                PointerDeviceKind.mouse,
+              },
+            ),
+            child: ListView.separated(
+              primary: true,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              separatorBuilder: (context, index) => const SizedBox(width: 16),
+              scrollDirection: Axis.horizontal,
+              itemCount: trainingList.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      "/${trainingList[index]['route']}",
+                    );
+                  },
+                  child: Card(
+                    margin: EdgeInsets.zero,
+                    child: Container(
+                      width: 180,
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          //
+                          Expanded(
+                            flex: 6,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: Colors.amber.shade200,
+                                // image: DecorationImage(
+                                //   fit: BoxFit.cover,
+                                //   image: NetworkImage(
+                                //     trainingList[index]['image']!,
+                                //   ),
+                                // ),
+                              ),
                             ),
                           ),
-                        ),
 
-                        const SizedBox(height: 6),
-                        //
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            trainingList[index]['title']!,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(
-                                  height: 1.2,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                          const SizedBox(height: 6),
+                          //
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              trainingList[index]['title']!,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(
+                                    height: 1.2,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ],

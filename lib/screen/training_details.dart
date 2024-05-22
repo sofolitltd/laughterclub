@@ -1,9 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '/screen/training.dart';
-import 'register_screen.dart';
 
 class TrainingDetails extends StatelessWidget {
   const TrainingDetails({super.key, required this.index});
@@ -185,175 +186,173 @@ class TrainingDetails extends StatelessWidget {
                 if (trainingList[index]['amount'][0] != 'Currently unavailable')
                   ElevatedButton(
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          String adminNumber = '01704340860';
-                          String amount = '';
-                          String mobileNumber = '';
-                          String transactionID = '';
+                      if (FirebaseAuth.instance.currentUser != null) {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            String adminNumber = '01704340860';
+                            String amount = '';
+                            String mobile = '';
+                            String transactionID = '';
 
-                          return AlertDialog(
-                            title: const Text('Payment'),
-                            content: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                RichText(
-                                  text: TextSpan(children: [
-                                    const TextSpan(
-                                      text: 'Please ',
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                    const TextSpan(
-                                      text: 'send money',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ),
-                                    const TextSpan(
-                                      text: ' to ',
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                    TextSpan(
-                                      text: adminNumber,
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.redAccent),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          Clipboard.setData(
-                                              ClipboardData(text: adminNumber));
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                                content: Text(
-                                                    '$adminNumber copied to clipboard')),
-                                          );
-                                        },
-                                    ),
-                                    const TextSpan(
-                                      text:
-                                          ' (bkash).\nThen provide your payment ',
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                    const TextSpan(
-                                      text: 'Amount, Mobile Number',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ),
-                                    const TextSpan(
-                                      text: ' and',
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                    const TextSpan(
-                                      text: ' Transaction ID',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ),
-                                    const TextSpan(
-                                      text: ' to proceed your registration.',
-                                      style: TextStyle(color: Colors.black),
-                                    ),
-                                  ], style: const TextStyle(height: 1.4)),
-                                ),
-
-                                // Assuming the user needs to enter the transaction ID
-                                const SizedBox(height: 16),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      flex: 2,
-                                      child: TextField(
-                                        decoration: InputDecoration(
-                                          labelText: 'Amount',
-                                          hintText: 'Enter amount',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.number,
-                                        onChanged: (value) {
-                                          amount = value;
-                                        },
+                            return AlertDialog(
+                              title: const Text('Payment'),
+                              content: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  RichText(
+                                    text: TextSpan(children: [
+                                      const TextSpan(
+                                        text: 'Please ',
+                                        style: TextStyle(color: Colors.black),
                                       ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      flex: 4,
-                                      child: TextField(
-                                        decoration: InputDecoration(
-                                          labelText: 'Mobile Number',
-                                          hintText: 'Enter mobile number',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.phone,
-                                        onChanged: (value) {
-                                          mobileNumber = value;
-                                        },
+                                      const TextSpan(
+                                        text: 'send money',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 16),
-                                TextField(
-                                  decoration: InputDecoration(
-                                    labelText: 'Transaction ID',
-                                    hintText: 'Enter transaction ID',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
+                                      const TextSpan(
+                                        text: ' to ',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                      TextSpan(
+                                        text: adminNumber,
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.redAccent),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            Clipboard.setData(ClipboardData(
+                                                text: adminNumber));
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                  content: Text(
+                                                      '$adminNumber copied to clipboard')),
+                                            );
+                                          },
+                                      ),
+                                      const TextSpan(
+                                        text:
+                                            ' (bkash).\nThen provide your payment ',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                      const TextSpan(
+                                        text: 'Amount, Mobile Number',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                      const TextSpan(
+                                        text: ' and',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                      const TextSpan(
+                                        text: ' Transaction ID',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black),
+                                      ),
+                                      const TextSpan(
+                                        text: ' to proceed your registration.',
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                    ], style: const TextStyle(height: 1.4)),
                                   ),
-                                  onChanged: (value) {
-                                    transactionID = value;
+
+                                  // Assuming the user needs to enter the transaction ID
+                                  const SizedBox(height: 16),
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        flex: 2,
+                                        child: TextField(
+                                          decoration: InputDecoration(
+                                            labelText: 'Amount',
+                                            hintText: 'Enter amount',
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          keyboardType: TextInputType.number,
+                                          onChanged: (value) {
+                                            amount = value;
+                                          },
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        flex: 4,
+                                        child: TextField(
+                                          decoration: InputDecoration(
+                                            labelText: 'Mobile Number',
+                                            hintText: 'Enter mobile number',
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          keyboardType: TextInputType.phone,
+                                          onChanged: (value) {
+                                            mobile = value;
+                                          },
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  TextField(
+                                    decoration: InputDecoration(
+                                      labelText: 'Transaction ID',
+                                      hintText: 'Enter transaction ID',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    onChanged: (value) {
+                                      transactionID = value;
+                                    },
+                                  ),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context); // Close the dialog
                                   },
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    if (amount.isEmpty ||
+                                        mobile.isEmpty ||
+                                        transactionID.isEmpty) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  'Please fill amount, mobile and transID')));
+                                    } else {
+                                      await submitForm(context, amount, mobile,
+                                          transactionID);
+                                    }
+                                  },
+                                  child: const Text('Proceed'),
                                 ),
                               ],
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context); // Close the dialog
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  if (amount.isEmpty ||
-                                      mobileNumber.isEmpty ||
-                                      transactionID.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                'Please fill amount, mobile and transID')));
-                                  } else {
-                                    Navigator.pop(context); // Close the dialog
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => RegisterScreen(
-                                          title: trainingList[index]['title'],
-                                          amount: amount,
-                                          mobile: mobileNumber,
-                                          trnID: transactionID,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: const Text('Proceed'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                            );
+                          },
+                        );
+                      } else {
+                        Navigator.pushNamed(
+                          context,
+                          '/login',
+                          arguments: "/${trainingList[index]['route']}",
+                        );
+                      }
                     },
                     child: Text('Register Now'.toUpperCase()),
                   ),
@@ -363,5 +362,49 @@ class TrainingDetails extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  //
+  submitForm(context, amount, mobile, transactionID) async {
+    // setState(() {
+    //   _isLoading = true;
+    // });
+
+    var user = FirebaseAuth.instance.currentUser!;
+    var name = 'FirebaseAuth.instance.currentUser!';
+
+    var userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+
+    //
+    await userRef.get().then((value) {
+      name = value.get('name');
+    });
+
+    try {
+      await FirebaseFirestore.instance.collection('payments').add({
+        'name': name,
+        'email': user.email,
+        'uid': user.uid,
+        'trainingCode': trainingList[index]['trainingCode'],
+        'payment': {
+          'amount': amount.trim(),
+          'mobile': mobile.trim(),
+          'transactionID': transactionID.trim().toUpperCase(),
+          'status': 'Pending',
+        },
+        'timestamp': FieldValue.serverTimestamp(),
+      }).then((val) async {
+        //
+        Navigator.pushNamedAndRemoveUntil(context, '/submit', (route) => false);
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to register: $e')),
+      );
+    } finally {
+      // setState(() {
+      //   _isLoading = false;
+      // });
+    }
   }
 }
