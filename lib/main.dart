@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Laughter Club',
       theme: ThemeData(
+        fontFamily: 'Montserrat-Regular',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
         useMaterial3: true,
         elevatedButtonTheme: ElevatedButtonThemeData(
