@@ -128,19 +128,19 @@ class HomeScreen extends StatelessWidget {
                               "Laughter Club".toUpperCase(),
                               style: Theme.of(context)
                                   .textTheme
-                                  .displayMedium!
+                                  .displaySmall!
                                   .copyWith(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                   ),
                             ),
                             const SizedBox(
-                                height: 10), // Add spacing between texts
+                                height: 4), // Add spacing between texts
                             Text(
                               "University of Chittagong",
                               style: Theme.of(context)
                                   .textTheme
-                                  .headlineMedium!
+                                  .headlineSmall!
                                   .copyWith(color: Colors.white),
                             ),
                           ],

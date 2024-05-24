@@ -97,11 +97,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           child: SingleChildScrollView(
             child: Container(
               constraints: const BoxConstraints(
-                maxWidth: 500,
+                maxWidth: 450,
               ),
               padding: const EdgeInsets.all(16.0),
               // margin: const EdgeInsets.only(top: 40),
               child: Card(
+                color: Colors.white,
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(vertical: 32, horizontal: 24),
@@ -242,7 +243,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ],
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () => createAccount(route),
                           child: _isLoading

@@ -69,9 +69,8 @@ class Training extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 0),
           child: Text(
             'Training',
-            style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                fontWeight: FontWeight.bold, fontSize: 18, letterSpacing: 1.2),
           ),
         ),
 
@@ -103,7 +102,7 @@ class Training extends StatelessWidget {
                     margin: EdgeInsets.zero,
                     child: Container(
                       width: 180,
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(10),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -113,7 +112,7 @@ class Training extends StatelessWidget {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
-                                color: Colors.amber.shade200,
+                                color: Colors.amber.shade100,
                                 // image: DecorationImage(
                                 //   fit: BoxFit.cover,
                                 //   image: NetworkImage(
@@ -124,19 +123,22 @@ class Training extends StatelessWidget {
                             ),
                           ),
 
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 8),
                           //
                           Expanded(
                             flex: 2,
-                            child: Text(
-                              trainingList[index]['title']!,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium!
-                                  .copyWith(
-                                    height: 1.2,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 4),
+                              child: Text(
+                                trainingList[index]['title']!,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleSmall!
+                                    .copyWith(
+                                      // height: 1.2,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
                             ),
                           ),
                         ],

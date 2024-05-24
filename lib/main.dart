@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:laughterclub/pdf_generator/add_screen.dart';
 import 'package:laughterclub/screen/login_screen.dart';
+import 'package:laughterclub/screen/payment_screen.dart';
 import 'package:laughterclub/screen/profile_screen.dart';
 import 'package:laughterclub/screen/register_screen.dart';
 
@@ -44,6 +45,7 @@ class MyApp extends StatelessWidget {
             textStyle: const TextStyle(
               fontWeight: FontWeight.bold,
               letterSpacing: 1,
+              fontFamily: 'Montserrat-Regular',
             ),
           ),
         ),
@@ -58,7 +60,8 @@ class MyApp extends StatelessWidget {
         '/profile': (context) => const ProfileScreen(),
         '/admin': (context) => const AdminLoginScreen(),
         '/add': (context) => const AddScreen(),
-        // '/payment': (context) => const PaymentScreen(),
+        '/payment': (context) => const Payment(),
+        '/pay': (context) => const PaymentScreen(),
         // '/member': (context) => const TrainingMemberScreen(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),

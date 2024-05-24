@@ -72,11 +72,12 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Align(
           child: SingleChildScrollView(
             child: Container(
-              constraints: const BoxConstraints(maxWidth: 500),
+              constraints: const BoxConstraints(maxWidth: 450),
               padding: const EdgeInsets.all(16.0),
               child: Form(
                 key: _formKey,
                 child: Card(
+                  color: Colors.white,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 32, horizontal: 24),
@@ -142,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 32),
                         const Text(
-                          'Don\'t have an account yet? Create One',
+                          'Don\'t have an account yet?',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,

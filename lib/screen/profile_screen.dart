@@ -28,9 +28,10 @@ class ProfileScreen extends StatelessWidget {
           ? Center(
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, '/login', arguments: '/profile');
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, '/', (route) => false);
                 },
-                child: const Text('Login'),
+                child: const Text('BAck to Home'),
               ),
             )
           : StreamBuilder<DocumentSnapshot>(
@@ -63,34 +64,89 @@ class ProfileScreen extends StatelessWidget {
                   child: Center(
                     child: Container(
                       constraints: const BoxConstraints(maxWidth: 1080),
-                      padding: const EdgeInsets.all(16),
+                      padding: MediaQuery.of(context).size.width > 700
+                          ? const EdgeInsets.symmetric(horizontal: 100)
+                          : const EdgeInsets.symmetric(horizontal: 16),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const CircleAvatar(
-                            radius: 50,
+                          // 1
+                          Card(
+                            margin: EdgeInsets.zero,
+                            // color: Colors.white,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(16, 32, 16, 16),
+                              child: Column(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 50,
+                                    backgroundColor: Colors.grey.shade200,
+                                    child: const Icon(
+                                      Icons.person,
+                                      size: 50,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    userData.get('name'),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(fontWeight: FontWeight.bold),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Chip(
+                                    label: Text(
+                                      '${userData.get('member')} Member',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 32),
+                                  Text(
+                                    'Mobile: ${userData.get('mobile')}',
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Email: ${userData.get('email')}',
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Institute: ${userData.get('institute')}',
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                  const SizedBox(height: 16),
+                                ],
+                              ),
+                            ),
                           ),
-                          const SizedBox(height: 16),
+
+                          //
+                          const SizedBox(height: 32),
+
                           Text(
-                            userData.get('name'),
-                            style: Theme.of(context).textTheme.titleMedium,
+                            'Trainings',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(height: 8),
-                          Text('Member: ${userData.get('member')}'),
-                          const SizedBox(height: 8),
-                          Text('Mobile: ${userData.get('mobile')}'),
-                          const SizedBox(height: 8),
-                          Text('Email: ${userData.get('email')}'),
-                          const SizedBox(height: 8),
-                          Text('Institute: ${userData.get('institute')}'),
-                          const SizedBox(height: 16),
-                          Text('Trainings:',
-                              style: Theme.of(context).textTheme.titleMedium),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           GridView.builder(
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount:
+                                  MediaQuery.of(context).size.width < 600
+                                      ? 2
+                                      : 3,
                               childAspectRatio: 3,
                               mainAxisSpacing: 16,
                               crossAxisSpacing: 16,
@@ -117,13 +173,13 @@ class ProfileScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                    padding: const EdgeInsets.all(16.0),
                                     child: Center(
                                       child: Text(
                                         training['title'],
                                         style: Theme.of(context)
                                             .textTheme
-                                            .titleMedium,
+                                            .bodyMedium,
                                         textAlign: TextAlign.center,
                                       ),
                                     ),
@@ -161,6 +217,8 @@ class TrainingDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isLargeScreen = MediaQuery.of(context).size.width >= 600;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(training['title']),
@@ -168,66 +226,83 @@ class TrainingDetailScreen extends StatelessWidget {
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 1080),
-          padding: MediaQuery.of(context).size.width > 700
-              ? const EdgeInsets.symmetric(horizontal: 100)
-              : const EdgeInsets.symmetric(horizontal: 16),
           child: Align(
             alignment: Alignment.topCenter,
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 16),
-                  Text(
-                    training['title'],
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Schedule:',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  for (var schedule in training['schedule'])
-                    Text(
-                      schedule,
-                      style: Theme.of(context).textTheme.bodyMedium,
+                  //
+                  Card(
+                    margin: EdgeInsets.zero,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Schedule',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          for (var schedule in training['schedule'])
+                            Text(
+                              schedule,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Amount',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          for (var amount in training['amount'])
+                            Text(
+                              amount,
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Trainers',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          for (var trainer in training['trainer'])
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  trainer['name'],
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                Text(
+                                  trainer['status'],
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                const SizedBox(height: 8),
+                              ],
+                            ),
+                        ],
+                      ),
                     ),
+                  ),
+
                   const SizedBox(height: 16),
                   Text(
-                    'Amount:',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    'Resources',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium!
+                        .copyWith(fontWeight: FontWeight.bold),
                   ),
-                  for (var amount in training['amount'])
-                    Text(
-                      amount,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Trainers:',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  for (var trainer in training['trainer'])
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          trainer['name'],
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        Text(
-                          trainer['status'],
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Files:',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+                  //
                   StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('training')
@@ -239,32 +314,80 @@ class TrainingDetailScreen extends StatelessWidget {
                         return const Text('Something went wrong');
                       }
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
+                        return const Center(child: CircularProgressIndicator());
                       }
                       if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                         return const Text('No files available');
                       }
                       var data = snapshot.data!.docs;
 
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: data.length,
-                        itemBuilder: (context, index) {
-                          var files = data[index].get('files') as List<dynamic>;
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: files.map<Widget>((file) {
-                              return Card(
-                                child: ListTile(
-                                  title: Text(file['name']),
-                                  onTap: () => _launchInURL(file['url']),
-                                ),
-                              );
-                            }).toList(),
-                          );
-                        },
-                      );
+                      if (isLargeScreen) {
+                        return GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            childAspectRatio: 3,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 16,
+                          ),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: data.length,
+                          itemBuilder: (context, index) {
+                            var files =
+                                data[index].get('files') as List<dynamic>;
+                            return Wrap(
+                              spacing: 16.0, // Horizontal spacing between cards
+                              runSpacing:
+                                  16.0, // Vertical spacing between cards
+                              children: files.map<Widget>((file) {
+                                return Card(
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: ListTile(
+                                    title: Text(file['name']),
+                                    onTap: () => _launchInURL(file['url']),
+                                  ),
+                                );
+                              }).toList(),
+                            );
+                          },
+                        );
+                      } else {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: data.length,
+                          itemBuilder: (context, index) {
+                            var files =
+                                data[index].get('files') as List<dynamic>;
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Wrap(
+                                spacing:
+                                    16.0, // Horizontal spacing between cards
+                                runSpacing:
+                                    16.0, // Vertical spacing between cards
+                                children: files.map<Widget>((file) {
+                                  return Card(
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: ListTile(
+                                      title: Text(file['name']),
+                                      onTap: () => _launchInURL(file['url']),
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            );
+                          },
+                        );
+                      }
                     },
                   ),
                 ],

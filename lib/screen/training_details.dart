@@ -187,165 +187,8 @@ class TrainingDetails extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       if (FirebaseAuth.instance.currentUser != null) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            String adminNumber = '01704340860';
-                            String amount = '';
-                            String mobile = '';
-                            String transactionID = '';
-
-                            return AlertDialog(
-                              title: const Text('Payment'),
-                              content: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  RichText(
-                                    text: TextSpan(children: [
-                                      const TextSpan(
-                                        text: 'Please ',
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                      const TextSpan(
-                                        text: 'send money',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black),
-                                      ),
-                                      const TextSpan(
-                                        text: ' to ',
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                      TextSpan(
-                                        text: adminNumber,
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.redAccent),
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () {
-                                            Clipboard.setData(ClipboardData(
-                                                text: adminNumber));
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                      '$adminNumber copied to clipboard')),
-                                            );
-                                          },
-                                      ),
-                                      const TextSpan(
-                                        text:
-                                            ' (bkash).\nThen provide your payment ',
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                      const TextSpan(
-                                        text: 'Amount, Mobile Number',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black),
-                                      ),
-                                      const TextSpan(
-                                        text: ' and',
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                      const TextSpan(
-                                        text: ' Transaction ID',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black),
-                                      ),
-                                      const TextSpan(
-                                        text: ' to proceed your registration.',
-                                        style: TextStyle(color: Colors.black),
-                                      ),
-                                    ], style: const TextStyle(height: 1.4)),
-                                  ),
-
-                                  // Assuming the user needs to enter the transaction ID
-                                  const SizedBox(height: 16),
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        flex: 2,
-                                        child: TextField(
-                                          decoration: InputDecoration(
-                                            labelText: 'Amount',
-                                            hintText: 'Enter amount',
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                          keyboardType: TextInputType.number,
-                                          onChanged: (value) {
-                                            amount = value;
-                                          },
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        flex: 4,
-                                        child: TextField(
-                                          decoration: InputDecoration(
-                                            labelText: 'Mobile Number',
-                                            hintText: 'Enter mobile number',
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                          keyboardType: TextInputType.phone,
-                                          onChanged: (value) {
-                                            mobile = value;
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  TextField(
-                                    decoration: InputDecoration(
-                                      labelText: 'Transaction ID',
-                                      hintText: 'Enter transaction ID',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                    onChanged: (value) {
-                                      transactionID = value;
-                                    },
-                                  ),
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context); // Close the dialog
-                                  },
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () async {
-                                    if (amount.isEmpty ||
-                                        mobile.isEmpty ||
-                                        transactionID.isEmpty) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(const SnackBar(
-                                              content: Text(
-                                                  'Please fill amount, mobile and transID')));
-                                    } else {
-                                      await submitForm(context, amount, mobile,
-                                          transactionID);
-                                    }
-                                  },
-                                  child: const Text('Proceed'),
-                                ),
-                              ],
-                            );
-                          },
-                        );
+                        Navigator.pushNamed(context, '/payment',
+                            arguments: index);
                       } else {
                         Navigator.pushNamed(
                           context,
@@ -363,15 +206,292 @@ class TrainingDetails extends StatelessWidget {
       ),
     );
   }
+}
 
-  //
-  submitForm(context, amount, mobile, transactionID) async {
-    // setState(() {
-    //   _isLoading = true;
-    // });
+class Payment extends StatefulWidget {
+  const Payment({super.key});
+
+  @override
+  State<Payment> createState() => _PaymentState();
+}
+
+class _PaymentState extends State<Payment> {
+  String adminNumber = '01704340860';
+  String amount = '';
+  String reference = '';
+  bool isOfflinePayment = false; //
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final index = ModalRoute.of(context)!.settings.arguments as int?;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Payment'),
+      ),
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(
+            maxWidth: 450,
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Align(
+            alignment: Alignment.center,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                //online
+                if (!isOfflinePayment)
+                  Card(
+                    margin: EdgeInsets.zero,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+                      child: Column(
+                        children: [
+                          // Online payment content
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                const TextSpan(
+                                  text: 'Please ',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                                const TextSpan(
+                                  text: 'send money',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: ' to ',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                                TextSpan(
+                                  text: adminNumber,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.redAccent,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      Clipboard.setData(
+                                        ClipboardData(text: adminNumber),
+                                      );
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            '$adminNumber copied to clipboard',
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                ),
+                                const TextSpan(
+                                  text:
+                                      ' (bkash/Nagad).\nThen provide payment ',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                                const TextSpan(
+                                  text: 'Amount & Mobile Number',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const TextSpan(
+                                  text: ' to proceed your registration.',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ],
+                              style: const TextStyle(
+                                height: 1.5,
+                                fontFamily: 'Montserrat-Regular',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Text fields for online payment
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    labelText: 'Amount',
+                                    hintText: 'Enter amount',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    amount = value;
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 4,
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    labelText: 'Mobile Number',
+                                    hintText: 'Enter mobile number',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.phone,
+                                  onChanged: (value) {
+                                    reference = value;
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                if (isOfflinePayment)
+                  Card(
+                    margin: EdgeInsets.zero,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
+                      child: Column(
+                        children: [
+                          // Offline payment content
+                          RichText(
+                            text: const TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Please enter',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                                TextSpan(
+                                  text: ' Receiver Name',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.redAccent,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: ' (who accept your payment) ',
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ],
+                              style: TextStyle(
+                                height: 1.5,
+                                fontFamily: 'Montserrat-Regular',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          // Text fields for offline payment
+                          Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    labelText: 'Amount',
+                                    hintText: 'Enter amount',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  onChanged: (value) {
+                                    amount = value;
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 4,
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    labelText: 'Receiver Name',
+                                    hintText: 'Receiver Name',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.name,
+                                  onChanged: (value) {
+                                    reference = value;
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Switch(
+                      value: isOfflinePayment,
+                      onChanged: (value) {
+                        setState(() {
+                          isOfflinePayment = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'I used offline payment method',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium!
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (amount.isEmpty || reference.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Please fill all field'),
+                        ),
+                      );
+
+                      //
+                    } else {
+                      await submitForm(context, index, amount, reference);
+                    }
+                  },
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : const Text('Proceed'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  submitForm(context, index, amount, reference) async {
+    setState(() {
+      _isLoading = true;
+    });
 
     var user = FirebaseAuth.instance.currentUser!;
-    var name = 'FirebaseAuth.instance.currentUser!';
+    var name = '';
 
     var userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
 
@@ -387,9 +507,9 @@ class TrainingDetails extends StatelessWidget {
         'uid': user.uid,
         'trainingCode': trainingList[index]['trainingCode'],
         'payment': {
+          'method': isOfflinePayment ? "Offline" : "Online",
           'amount': amount.trim(),
-          'mobile': mobile.trim(),
-          'transactionID': transactionID.trim().toUpperCase(),
+          'reference': reference.trim(),
           'status': 'Pending',
         },
         'timestamp': FieldValue.serverTimestamp(),
@@ -402,9 +522,9 @@ class TrainingDetails extends StatelessWidget {
         SnackBar(content: Text('Failed to register: $e')),
       );
     } finally {
-      // setState(() {
-      //   _isLoading = false;
-      // });
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 }

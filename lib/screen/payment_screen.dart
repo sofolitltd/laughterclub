@@ -105,7 +105,7 @@ class MyTable extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
-                  'Mobile(bKash)',
+                  'Method',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -114,7 +114,7 @@ class MyTable extends StatelessWidget {
               child: Padding(
                 padding: EdgeInsets.all(8.0),
                 child: Text(
-                  'Transaction ID',
+                  'Reference',
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
@@ -188,14 +188,14 @@ class MyTable extends StatelessWidget {
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(itemData['payment']['mobile']),
+            child: Text(itemData['payment']['method']),
           ),
         ),
         TableCell(
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(itemData['payment']['transactionID']),
+            child: Text(itemData['payment']['reference']),
           ),
         ),
         TableCell(
