@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:laughterclub/screen/payment_screen.dart';
+import 'package:laughterclub/screen/admin/admin_payment.dart';
 
 class AdminLoginScreen extends StatefulWidget {
   const AdminLoginScreen({super.key});
@@ -49,7 +49,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen>
       if (username == adminUsername && password == adminPassword) {
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const PaymentScreen()),
+            MaterialPageRoute(builder: (context) => const AdminPayment()),
             (route) => false);
       } else {
         setState(() {

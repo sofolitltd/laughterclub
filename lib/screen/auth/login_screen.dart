@@ -13,23 +13,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _passwordFocusNode = FocusNode();
 
   bool _isLoading = false;
-
-  String _getErrorMessage(String errorCode) {
-    switch (errorCode) {
-      case 'invalid-email':
-        return 'The email address is not valid.';
-      case 'user-disabled':
-        return 'The user account has been disabled.';
-      case 'user-not-found':
-        return 'No user found for this email.';
-      case 'wrong-password':
-        return 'Incorrect password provided.';
-      default:
-        return 'An unknown error occurred.';
-    }
-  }
+  bool _obscurePassword = true;
 
   void _login(String? route) async {
     if (_formKey.currentState!.validate()) {
@@ -48,11 +35,7 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       } on FirebaseAuthException catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login Failed: ${_getErrorMessage(e.code)}')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login Failed: $e')),
+          SnackBar(content: Text('Login Failed: ${(e.code)}')),
         );
       } finally {
         setState(() {
@@ -109,18 +92,36 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                             return null;
                           },
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) {
+                            FocusScope.of(context)
+                                .requestFocus(_passwordFocusNode);
+                          },
                         ),
                         const SizedBox(height: 16.0),
                         TextFormField(
                           controller: _passwordController,
+                          focusNode: _passwordFocusNode,
                           decoration: InputDecoration(
                             labelText: 'Password',
                             hintText: 'Enter Strong Password',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
                           ),
-                          obscureText: true,
+                          obscureText: _obscurePassword,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your password';
@@ -129,6 +130,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                             return null;
                           },
+                          textInputAction: TextInputAction.done,
+                          onFieldSubmitted: (_) => _login(route),
                         ),
                         const SizedBox(height: 20),
                         ElevatedButton(
@@ -139,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   width: 24,
                                   child: CircularProgressIndicator(),
                                 )
-                              : const Text('Login'),
+                              : Text('Login'.toUpperCase()),
                         ),
                         const SizedBox(height: 32),
                         const Text(

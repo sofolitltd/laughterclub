@@ -1,17 +1,17 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
-import 'package:laughterclub/pdf_generator/add_screen.dart';
-import 'package:laughterclub/screen/login_screen.dart';
-import 'package:laughterclub/screen/payment_screen.dart';
-import 'package:laughterclub/screen/profile_screen.dart';
-import 'package:laughterclub/screen/register_screen.dart';
 
-import '/screen/admin_login_screen.dart';
+import '/pdf_generator/add_screen.dart';
+import '/screen/admin/admin_payment.dart';
+import '/screen/auth/login_screen.dart';
+import '/screen/auth/register_screen.dart';
+import '/screen/profile/profile_screen.dart';
 import 'firebase_options.dart';
-import 'screen/home_screen.dart';
-import 'screen/submit_page.dart';
-import 'screen/training_details.dart';
+import 'screen/admin/admin_login_screen.dart';
+import 'screen/home/home_screen.dart';
+import 'screen/training/training_details.dart';
+import 'screen/training/training_payment.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +34,14 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Montserrat-Regular',
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
         useMaterial3: true,
+        appBarTheme: AppBarTheme(
+          centerTitle: true,
+          titleTextStyle: Theme.of(context).textTheme.titleMedium!.copyWith(
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Montserrat-Regular',
+                fontSize: 18,
+              ),
+        ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             shape: RoundedRectangleBorder(
@@ -55,65 +63,64 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
+      onGenerateRoute: (settings) {
+        final uri = Uri.parse(settings.name!);
+
+        // Handle single path segments, e.g., '/basic-counseling'
+        if (uri.pathSegments.length == 1) {
+          final routeName = uri.pathSegments.first;
+          return MaterialPageRoute(
+            builder: (context) => TrainingDetail(routeName: routeName),
+            settings: settings,
+          );
+        }
+
+        // Handle nested path segments, e.g., '/basic-counseling-1/payment'
+        if (uri.pathSegments.length == 2) {
+          final trainingName = uri.pathSegments.first;
+          final subRoute = uri.pathSegments[1];
+
+          if (subRoute == 'payment') {
+            return MaterialPageRoute(
+              builder: (context) => TrainingPayment(routeName: trainingName),
+              settings: settings,
+            );
+          }
+        }
+        // Return null if no match found
+        return null;
+      },
       routes: {
         '/': (context) => const HomeScreen(),
-        '/profile': (context) => const ProfileScreen(),
         '/admin': (context) => const AdminLoginScreen(),
-        '/add': (context) => const AddScreen(),
-        '/payment': (context) => const Payment(),
-        '/pay': (context) => const PaymentScreen(),
-        // '/member': (context) => const TrainingMemberScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/certificate': (context) => const AddScreen(),
+        '/check': (context) => const AdminPayment(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
-        '/basic-counseling': (context) => const TrainingDetails(index: 0),
-        '/advanced-counseling': (context) => const TrainingDetails(index: 1),
-        '/cbt': (context) => const TrainingDetails(index: 2),
-        '/submit': (context) => const SubmitPage(),
       },
     );
   }
 }
 
-//
-// email
-// "rezoana.shanta25@gmail.com"
-// (string)
-//
-// institute
-// "University of Chittagong "
-// (string)
-//
-// mobileNo
-// "01308599298"
-// (string)
-//
-// name
-// "Rezoana Parveen Shanta"
-// (string)
-//
-//
-// payment
-// (map)
-//
-// amount
-// "2000"
-// (string)
-//
-// mobile
-// "01308599298"
-// (string)
-//
-// status
-// "Completed"
-// (string)
-//
-// transactionID
-// "BEM3KTRKKH"
-// (string)
-//
-// timestamp
-// May 22, 2024 at 1:45:43 AM UTC+6
-// (timestamp)
-//
-// training
-// "Basic Counseling"
+//x
+class UnknownRouteScreen extends StatelessWidget {
+  const UnknownRouteScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Unknown Route'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).pushReplacementNamed('/');
+          },
+          child: const Text('Back to Home'),
+        ),
+      ),
+    );
+  }
+}

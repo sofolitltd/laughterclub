@@ -4,11 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class PaymentScreen extends StatelessWidget {
-  const PaymentScreen({super.key});
+class AdminPayment extends StatelessWidget {
+  const AdminPayment({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var trainingId = 'basic-counseling-2';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Payment Check'),
@@ -16,7 +18,7 @@ class PaymentScreen extends StatelessWidget {
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('payments')
-            .where('trainingCode', isEqualTo: 'basic-counseling-2401')
+            .where('route', isEqualTo: trainingId)
             // .orderBy('name')
             .snapshots(),
         builder: (context, snapshot) {
@@ -202,7 +204,7 @@ class MyTable extends StatelessWidget {
           verticalAlignment: TableCellVerticalAlignment.middle,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(itemData['payment']['amount']),
+            child: Text(itemData['payment']['fee']),
           ),
         ),
         TableCell(
@@ -221,6 +223,7 @@ class MyTable extends StatelessWidget {
   }
 }
 
+//
 class RowItem extends StatefulWidget {
   final QueryDocumentSnapshot itemData;
 
@@ -258,14 +261,12 @@ class _RowItemState extends State<RowItem> {
 
       if (selectedStatus == 'Completed') {
         await userRef.update({
-          'training':
-              FieldValue.arrayUnion([widget.itemData.get('trainingCode')]),
+          'trainings': FieldValue.arrayUnion([widget.itemData.get('route')]),
         });
       } else {
         //
         await userRef.update({
-          'training':
-              FieldValue.arrayRemove([widget.itemData.get('trainingCode')]),
+          'trainings': FieldValue.arrayRemove([widget.itemData.get('route')]),
         });
       }
     } catch (e) {
@@ -281,6 +282,7 @@ class _RowItemState extends State<RowItem> {
         padding: EdgeInsets.zero,
         isExpanded: true,
         value: selectedStatus,
+        focusColor: Colors.transparent,
         items: <String>['Pending', 'Completed', 'Failed']
             .map<DropdownMenuItem<String>>((String value) {
           Color? itemColor;
@@ -356,8 +358,7 @@ class DeletePayment extends StatelessWidget {
                 .collection('users')
                 .doc(itemData.get('uid'));
             await userRef.update({
-              'training':
-                  FieldValue.arrayRemove([itemData.get('trainingCode')]),
+              'trainings': FieldValue.arrayRemove([itemData.get('route')]),
             });
 
             //

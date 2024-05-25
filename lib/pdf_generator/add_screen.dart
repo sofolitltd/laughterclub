@@ -388,6 +388,8 @@ class _AddScreenState extends State<AddScreen> {
   final TextEditingController _nameController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
 
+  var trainingID = "Pm52xAxZYyFrIpFyM1Mc";
+
   @override
   void dispose() {
     _nameFocusNode.dispose();
@@ -395,12 +397,11 @@ class _AddScreenState extends State<AddScreen> {
     super.dispose();
   }
 
+  //
   Future<void> _generateCertificates() async {
-    final firestore = FirebaseFirestore.instance;
+    final ref = FirebaseFirestore.instance.collection('trainings');
 
-    final namesSnapshot = await firestore
-        .collection('training/ME49ryDAn4ExrNmXAtBZ/members')
-        .get();
+    final namesSnapshot = await ref.doc(trainingID).collection('members').get();
 
     final names = namesSnapshot.docs.map((doc) => doc['name']).toList();
 
@@ -412,21 +413,19 @@ class _AddScreenState extends State<AddScreen> {
     });
 
     try {
-      final doc = await firestore
-          .collection('training')
-          .doc('ME49ryDAn4ExrNmXAtBZ')
-          .get();
-      final certificateType = doc.get('certificateType');
-      final name = certificateType['name'];
-      final imageUrl = certificateType['url'];
-      final position = certificateType['position'];
+      final doc = await ref.doc(trainingID).get();
 
-      for (var fileName in names) {
+      //
+      final trainingTitle = doc.get('title');
+      final background = doc.get('certificate')['background'];
+      final position = doc.get('certificate')['position'];
+
+      for (var memberName in names) {
         setState(() {
-          _activePdfName = fileName;
+          _activePdfName = memberName;
         });
         await _generateCertificateInBackground(
-            fileName, imageUrl, position, name);
+            memberName, background, position, trainingTitle);
       }
     } finally {
       setState(() {
@@ -442,44 +441,48 @@ class _AddScreenState extends State<AddScreen> {
 
   Future<void> _generateSingleCertificate(String fileName) async {
     final firestore = FirebaseFirestore.instance;
-    final doc = await firestore
-        .collection('training')
-        .doc('ME49ryDAn4ExrNmXAtBZ')
-        .get();
+    final doc = await firestore.collection('trainings').doc(trainingID).get();
 
-    final certificateType = doc.get('certificateType');
-    final name = certificateType['name'];
-    final imageUrl = certificateType['url'];
-    final position = certificateType['position'];
+    final trainingTitle = doc.get('title');
+    final background = doc.get('certificate')['background'];
+    final position = doc.get('certificate')['position'];
 
-    await _generateCertificateInBackground(fileName, imageUrl, position, name);
+    await _generateCertificateInBackground(
+        fileName, background, position, trainingTitle);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('$fileName certificate has been generated!')),
     );
   }
 
-  static Future<void> _generateCertificateInBackground(
-      String fileName, String imageUrl, double position, String type) async {
+  static Future<void> _generateCertificateInBackground(String memberName,
+      String background, double position, String trainingTitle) async {
     return await compute(_generateCertificate, {
-      'fileName': fileName,
-      'imageUrl': imageUrl,
+      'memberName': memberName,
+      'background': background,
       'position': position,
-      'type': type
+      'trainingTitle': trainingTitle
     });
   }
 
   static Future<void> _generateCertificate(Map<String, dynamic> params) async {
-    final fileName = params['fileName']!;
-    final imageUrl = params['imageUrl']!;
+    final memberName = params['memberName']!;
+    final background = params['background']!;
     final position = params['position']!;
-    final type = params['type']!;
-    await PdfGenerator.createCertificate(fileName, imageUrl, position, type);
+    final trainingTitle = params['trainingTitle']!;
+
+    //
+    await PdfGenerator.createCertificate(
+        memberName, background, position, trainingTitle);
   }
 
   Future<void> _addName(String name) async {
     final firestore = FirebaseFirestore.instance;
-    await firestore.collection('training/ME49ryDAn4ExrNmXAtBZ/members').add({
+    await firestore
+        .collection('trainings')
+        .doc(trainingID)
+        .collection('members')
+        .add({
       'name': _capitalizeEachWord(name),
     });
     _nameController.clear();
@@ -640,7 +643,9 @@ class _AddScreenState extends State<AddScreen> {
               if (!_isLoading)
                 StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
-                      .collection('training/ME49ryDAn4ExrNmXAtBZ/members')
+                      .collection('trainings')
+                      .doc(trainingID)
+                      .collection('members')
                       .orderBy('name')
                       .snapshots(),
                   builder: (context, snapshot) {
@@ -712,8 +717,9 @@ class _AddScreenState extends State<AddScreen> {
                                               final doc =
                                                   snapshot.data!.docs[index];
                                               await FirebaseFirestore.instance
-                                                  .collection(
-                                                      'training/ME49ryDAn4ExrNmXAtBZ/members')
+                                                  .collection('trainings')
+                                                  .doc(trainingID)
+                                                  .collection('members')
                                                   .doc(doc.id)
                                                   .delete();
                                             },

@@ -6,8 +6,8 @@ import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:universal_html/html.dart' as html;
 
 class PdfGenerator {
-  static Future<void> createCertificate(
-      String name, String imageUrl, double position, String type) async {
+  static Future<void> createCertificate(String name, String background,
+      double position, String trainingTitle) async {
     // Create a PDF document.
     final PdfDocument document = PdfDocument();
     document.pageSettings.margins.all = 0;
@@ -23,13 +23,13 @@ class PdfGenerator {
     final Size pageSize = page.getClientSize();
 
     // Draw image from the internet
-    final Uint8List imageData = await _fetchImageData(imageUrl);
+    final Uint8List imageData = await _fetchImageData(background);
     page.graphics.drawImage(PdfBitmap(imageData),
         Rect.fromLTWH(0, 0, pageSize.width, pageSize.height));
 
     // Create font
     final PdfFont nameFont =
-        await _loadCustomFont('assets/fonts/PinyonScript-Regular.ttf', 48);
+        await _loadCustomFont('assets/fonts/PinyonScript-Regular.ttf', 50);
 
     // Calculate the X position for the name text
     double x = _calculateXPosition(name, nameFont, pageSize.width);
@@ -43,7 +43,7 @@ class PdfGenerator {
     document.dispose();
 
     // Save and launch file
-    await _saveAndLaunchFile(bytes, '$name ($type).pdf');
+    await _saveAndLaunchFile(bytes, '$name ($trainingTitle).pdf');
   }
 
   static Future<PdfTrueTypeFont> _loadCustomFont(

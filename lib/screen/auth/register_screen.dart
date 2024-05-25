@@ -13,12 +13,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _instituteController = TextEditingController();
   final TextEditingController _mobileNumberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _instituteController = TextEditingController();
+
+  final FocusNode _nameFocusNode = FocusNode();
+  final FocusNode _instituteFocusNode = FocusNode();
+  final FocusNode _mobileNumberFocusNode = FocusNode();
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
 
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +52,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         });
 
         try {
-          // Register the user with email and password
           UserCredential userCredential =
               await _auth.createUserWithEmailAndPassword(
             email: _emailController.text.trim(),
@@ -54,24 +60,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
           if (userCredential.user!.uid.isEmpty) return;
 
-          // Add user details to Firestore
           await FirebaseFirestore.instance
               .collection('users')
               .doc(userCredential.user!.uid)
               .set({
             'uid': userCredential.user!.uid,
             'name': capitalizeEachWord(_nameController.text.trim()),
-            'institute': capitalizeEachWord(_instituteController.text.trim()),
+            'institute': _instituteController.text.trim(),
             'mobile': _mobileNumberController.text.trim(),
             'email': _emailController.text.trim(),
             'image': '',
             'member': 'General',
-            'training': [],
+            'trainings': [],
             'timestamp': FieldValue.serverTimestamp(),
           }).then((val) {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text('Successfully Create your Account')));
-            //
             Navigator.pushNamedAndRemoveUntil(context, route, (route) => false);
           });
         } catch (e) {
@@ -86,21 +90,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     }
 
-    //
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Account'),
       ),
       body: Center(
         child: Align(
-          // alignment: Alignment.topCenter,
           child: SingleChildScrollView(
             child: Container(
               constraints: const BoxConstraints(
                 maxWidth: 450,
               ),
               padding: const EdgeInsets.all(16.0),
-              // margin: const EdgeInsets.only(top: 40),
               child: Card(
                 color: Colors.white,
                 child: Padding(
@@ -113,6 +114,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       children: [
                         TextFormField(
                           controller: _nameController,
+                          focusNode: _nameFocusNode,
                           decoration: InputDecoration(
                             labelText: 'Name',
                             hintText: 'Enter Certificate Name',
@@ -120,8 +122,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
+                          textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.name,
                           textCapitalization: TextCapitalization.words,
+                          onFieldSubmitted: (_) {
+                            FocusScope.of(context).requestFocus(
+                                _instituteFocusNode); // Move focus to next
+                          },
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Please enter your name';
@@ -132,6 +139,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _instituteController,
+                          focusNode: _instituteFocusNode,
                           decoration: InputDecoration(
                             labelText: 'Institute',
                             hintText: 'Enter University/College Name',
@@ -139,6 +147,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (_) {
+                            FocusScope.of(context).requestFocus(
+                                _mobileNumberFocusNode); // Move focus to next
+                          },
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Please enter your institute';
@@ -149,6 +162,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _mobileNumberController,
+                          focusNode: _mobileNumberFocusNode,
                           decoration: InputDecoration(
                             labelText: 'Mobile',
                             hintText: 'Enter Mobile No',
@@ -156,7 +170,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
+                          textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.phone,
+                          onFieldSubmitted: (_) {
+                            FocusScope.of(context).requestFocus(
+                                _emailFocusNode); // Move focus to next
+                          },
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Please enter your mobile number';
@@ -167,6 +186,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _emailController,
+                          focusNode: _emailFocusNode,
                           decoration: InputDecoration(
                             labelText: 'Email',
                             hintText: 'Enter Active Email',
@@ -174,7 +194,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
+                          textInputAction: TextInputAction.next,
                           keyboardType: TextInputType.emailAddress,
+                          onFieldSubmitted: (_) {
+                            FocusScope.of(context).requestFocus(
+                                _passwordFocusNode); // Move focus to next
+                          },
                           validator: (value) {
                             if (value!.isEmpty || !value.contains('@')) {
                               return 'Please enter a valid email';
@@ -185,14 +210,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         const SizedBox(height: 16),
                         TextFormField(
                           controller: _passwordController,
+                          focusNode: _passwordFocusNode,
                           decoration: InputDecoration(
                             labelText: 'Password',
                             hintText: 'Enter Strong Password',
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                            ),
                           ),
-                          obscureText: true,
+                          textInputAction: TextInputAction.done,
+                          obscureText: !_isPasswordVisible,
+                          onFieldSubmitted: (_) {
+                            createAccount(route); // Submit form
+                          },
                           validator: (value) {
                             if (value!.isEmpty || value.length < 6) {
                               return 'Password must be at least 6 characters long';
@@ -245,7 +287,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed: () => createAccount(route),
+                          onPressed:
+                              _isLoading ? null : () => createAccount(route),
                           child: _isLoading
                               ? const SizedBox(
                                   height: 24,
