@@ -31,7 +31,7 @@ class TrainingDetail extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Training not found!',
+                  'Data not found!',
                   style: Theme.of(context)
                       .textTheme
                       .titleLarge!

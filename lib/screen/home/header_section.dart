@@ -108,18 +108,28 @@ class HeaderSection extends StatelessWidget {
                 children: [
                   Text(
                     "Laughter Club".toUpperCase(),
-                    style: Theme.of(context).textTheme.displaySmall!.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: MediaQuery.of(context).size.width > 400
+                        ? Theme.of(context).textTheme.displaySmall!.copyWith(
+                              color: Colors.white.withOpacity(.9),
+                              fontWeight: FontWeight.bold,
+                            )
+                        : Theme.of(context).textTheme.headlineMedium!.copyWith(
+                              color: Colors.white.withOpacity(.9),
+                              fontWeight: FontWeight.bold,
+                            ),
                   ),
                   const SizedBox(height: 4), // Add spacing between texts
                   Text(
                     "University of Chittagong",
-                    style: Theme.of(context)
-                        .textTheme
-                        .headlineSmall!
-                        .copyWith(color: Colors.white),
+                    style: MediaQuery.of(context).size.width > 400
+                        ? Theme.of(context)
+                            .textTheme
+                            .headlineSmall!
+                            .copyWith(color: Colors.white.withOpacity(.8))
+                        : Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(color: Colors.white.withOpacity(.8)),
                   ),
                 ],
               ),

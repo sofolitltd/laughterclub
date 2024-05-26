@@ -24,7 +24,7 @@ class TrainingSection extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         SizedBox(
-          height: 216,
+          height: 240,
           child: StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('trainings')
@@ -67,13 +67,13 @@ class TrainingSection extends StatelessWidget {
                       child: Card(
                         margin: EdgeInsets.zero,
                         child: Container(
-                          width: 200,
+                          width: 215,
                           padding: const EdgeInsets.all(10),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Expanded(
-                                flex: 6,
+                                flex: 8,
                                 child: Container(
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
@@ -116,7 +116,7 @@ class TrainingSection extends StatelessWidget {
                                     margin: const EdgeInsets.only(
                                       left: 4,
                                       bottom: 4,
-                                      top: 4,
+                                      top: 6,
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.only(
