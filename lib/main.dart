@@ -7,6 +7,7 @@ import '/screen/admin/admin_payment.dart';
 import '/screen/auth/login_screen.dart';
 import '/screen/auth/register_screen.dart';
 import '/screen/profile/profile_screen.dart';
+import 'analysis/question_analysis.dart';
 import 'firebase_options.dart';
 import 'screen/admin/admin_login_screen.dart';
 import 'screen/home/home_screen.dart';
@@ -98,6 +99,7 @@ class MyApp extends StatelessWidget {
         '/check': (context) => const AdminPayment(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
+        '/analysis': (context) => QuestionAnalysis(),
       },
     );
   }

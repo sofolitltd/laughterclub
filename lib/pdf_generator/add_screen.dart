@@ -397,14 +397,11 @@ class _AddScreenState extends State<AddScreen> {
     super.dispose();
   }
 
-  //
+  // multi pdf
   Future<void> _generateCertificates() async {
     final ref = FirebaseFirestore.instance.collection('trainings');
-
     final namesSnapshot = await ref.doc(trainingID).collection('members').get();
-
     final names = namesSnapshot.docs.map((doc) => doc['name']).toList();
-
     if (names.isEmpty || _isLoading) return;
 
     setState(() {
@@ -439,6 +436,7 @@ class _AddScreenState extends State<AddScreen> {
     );
   }
 
+  // single pdf
   Future<void> _generateSingleCertificate(String fileName) async {
     final firestore = FirebaseFirestore.instance;
     final doc = await firestore.collection('trainings').doc(trainingID).get();
@@ -455,6 +453,7 @@ class _AddScreenState extends State<AddScreen> {
     );
   }
 
+  // background task
   static Future<void> _generateCertificateInBackground(String memberName,
       String background, double position, String trainingTitle) async {
     return await compute(_generateCertificate, {
@@ -476,6 +475,7 @@ class _AddScreenState extends State<AddScreen> {
         memberName, background, position, trainingTitle);
   }
 
+  // add name
   Future<void> _addName(String name) async {
     final firestore = FirebaseFirestore.instance;
     await firestore
@@ -489,6 +489,7 @@ class _AddScreenState extends State<AddScreen> {
     _nameFocusNode.requestFocus();
   }
 
+  // capitalize
   String _capitalizeEachWord(String input) {
     if (input.isEmpty) return input;
     return input.trim().split(' ').map((word) {
