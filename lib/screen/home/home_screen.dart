@@ -63,17 +63,22 @@ class HomeScreen extends StatelessWidget {
                 : const EdgeInsets.symmetric(
                     horizontal: 16,
                   ),
-            child: const Column(
+            child: Column(
               children: [
                 // header
-                HeaderSection(),
+                const HeaderSection(),
 
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
+
+                // appointment
+                appointmentSection(context),
+
+                const SizedBox(height: 32),
 
                 // Training
-                TrainingSection(),
+                const TrainingSection(),
 
-                SizedBox(height: 32),
+                const SizedBox(height: 32),
               ],
             ),
           ),
@@ -81,4 +86,39 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget appointmentSection(BuildContext context) {
+  return InkWell(
+    onTap: () {
+      Navigator.pushNamed(context, '/appointment');
+    },
+    borderRadius: BorderRadius.circular(10),
+    child: Container(
+      width: double.infinity,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(),
+      ),
+      child: Column(
+        children: [
+          Text(
+            'Book for counseling services',
+            style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                  fontWeight: FontWeight.w300,
+                ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Get Appointment',
+            style: Theme.of(context).textTheme.headlineSmall!.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+        ],
+      ),
+    ),
+  );
 }

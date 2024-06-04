@@ -1,29 +1,109 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class QuestionAnalysis extends StatelessWidget {
+class QuestionAnalysis extends StatefulWidget {
   const QuestionAnalysis({super.key});
 
+  @override
+  State<QuestionAnalysis> createState() => _QuestionAnalysisState();
+}
+
+class _QuestionAnalysisState extends State<QuestionAnalysis> {
+  // Create TextEditingController instances for the form fields
+  final TextEditingController _yearController = TextEditingController();
+  final TextEditingController _chapterController = TextEditingController();
+  final TextEditingController _noController = TextEditingController();
+  final TextEditingController _subPointController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
+  final TextEditingController _markController = TextEditingController();
+
+  // Method to show the BottomSheet with the form
+  showBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _yearController,
+                decoration: const InputDecoration(labelText: 'Year'),
+              ),
+              TextField(
+                controller: _chapterController,
+                decoration: const InputDecoration(labelText: 'Chapter'),
+              ),
+              TextField(
+                controller: _noController,
+                decoration: const InputDecoration(labelText: 'No'),
+              ),
+              TextField(
+                controller: _subPointController,
+                decoration: const InputDecoration(labelText: 'Sub Point'),
+              ),
+              TextField(
+                controller: _textController,
+                decoration: const InputDecoration(labelText: 'Text'),
+              ),
+              TextField(
+                controller: _markController,
+                decoration: const InputDecoration(labelText: 'Mark'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _addQuestionToFirestore,
+                child: const Text('Add'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Method to collect data from the form and upload to Firestore
+  void _addQuestionToFirestore() {
+    var data = {
+      'chapter': _chapterController.text,
+      'no': _noController.text,
+      'subPoint': _subPointController.text,
+      'text': _textController.text,
+      'mark': _markController.text,
+    };
+
+    var ref = FirebaseFirestore.instance.collection('questions');
+    ref
+        .doc('G7MjeVTIx3c1oWBWwTWq')
+        .collection('years')
+        .doc('2022')
+        .collection('questions')
+        .add(data)
+        .then((value) {
+      // Clear the form fields after submission
+      _chapterController.clear();
+      _noController.clear();
+      _subPointController.clear();
+      _textController.clear();
+      _markController.clear();
+
+      // Close the BottomSheet
+      Navigator.pop(context);
+    }).catchError((error) {
+      print("Failed to add question: $error");
+    });
+  }
+
+  //
   @override
   Widget build(BuildContext context) {
     var quesRef = FirebaseFirestore.instance.collection('questions');
 
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          var ref = FirebaseFirestore.instance.collection('questions');
-
-          //
-          var data = QuestionData(
-              chapter: '2', no: '1', subPoint: 'b', text: '', mark: '1');
-          ref
-              .doc('G7MjeVTIx3c1oWBWwTWq')
-              .collection('years')
-              .doc('2022')
-              .collection('questions')
-              .add(data.toJson());
-        },
-        child: Text('Add'),
+        onPressed: () => showBottomSheet(),
+        child: const Text('Add'),
       ),
       appBar: AppBar(
         title: const Text('Question Analysis Generator'),
@@ -78,8 +158,11 @@ class QuestionAnalysis extends StatelessWidget {
 
                     // years
                     StreamBuilder<QuerySnapshot>(
-                        stream:
-                            quesRef.doc(docID).collection('years').snapshots(),
+                        stream: quesRef
+                            .doc(docID)
+                            .collection('years')
+                            .orderBy('year', descending: true)
+                            .snapshots(),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return const Text('No data!');
@@ -152,6 +235,7 @@ class QuestionAnalysis extends StatelessWidget {
                                       stream: quesRef
                                           .doc(docID)
                                           .collection('years')
+                                          .orderBy('year', descending: true)
                                           .snapshots(),
                                       builder: (context, snapshot) {
                                         if (!snapshot.hasData) {
@@ -164,124 +248,134 @@ class QuestionAnalysis extends StatelessWidget {
 
                                         var docs = snapshot.data!.docs;
 
-                                        return Row(
-                                          children: [
-                                            for (var doc in docs)
-                                              Expanded(
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(),
-                                                  ),
-                                                  child: Padding(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(vertical: 8),
-                                                    child: StreamBuilder<
-                                                            QuerySnapshot>(
-                                                        stream: doc.reference
-                                                            .collection(
-                                                                'questions')
-                                                            .snapshots(),
-                                                        builder: (context,
-                                                            snapshot) {
-                                                          if (!snapshot
-                                                              .hasData) {
-                                                            return const Text(
-                                                                'No data!');
-                                                          }
-                                                          if (snapshot
-                                                                  .connectionState ==
-                                                              ConnectionState
-                                                                  .waiting) {
-                                                            return const Text(
-                                                                "Loading");
-                                                          }
+                                        return Container(
+                                          decoration: BoxDecoration(
+                                            border: Border.all(),
+                                          ),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              for (var doc in docs)
+                                                Expanded(
+                                                  child: Container(
+                                                    decoration:
+                                                        const BoxDecoration(
+                                                      border: Border(
+                                                        right: BorderSide(
+                                                            width: .5),
+                                                        left: BorderSide(
+                                                            width: .5),
+                                                      ),
+                                                    ),
+                                                    child: Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          vertical: 8),
+                                                      child: StreamBuilder<
+                                                              QuerySnapshot>(
+                                                          stream: doc.reference
+                                                              .collection(
+                                                                  'questions')
+                                                              .snapshots(),
+                                                          builder: (context,
+                                                              snapshot) {
+                                                            if (!snapshot
+                                                                .hasData) {
+                                                              return const Text(
+                                                                  'No data!');
+                                                            }
+                                                            if (snapshot
+                                                                    .connectionState ==
+                                                                ConnectionState
+                                                                    .waiting) {
+                                                              return const Text(
+                                                                  "Loading");
+                                                            }
 
-                                                          var docs = snapshot
-                                                              .data!.docs;
+                                                            var docs = snapshot
+                                                                .data!.docs;
 
-                                                          //
-                                                          return ListView
-                                                              .builder(
-                                                            shrinkWrap: true,
-                                                            itemCount:
-                                                                docs.length,
-                                                            itemBuilder:
-                                                                (BuildContext
-                                                                        context,
-                                                                    int i) {
-                                                              var chapter =
-                                                                  docs[i].get(
-                                                                      'chapter');
-                                                              var no = docs[i]
-                                                                  .get('no');
-                                                              var subPoint =
-                                                                  docs[i].get(
-                                                                      'subPoint');
-                                                              var text = docs[i]
-                                                                  .get('text');
-                                                              var mark = docs[i]
-                                                                  .get('mark');
+                                                            //
+                                                            return ListView
+                                                                .builder(
+                                                              shrinkWrap: true,
+                                                              itemCount:
+                                                                  docs.length,
+                                                              itemBuilder:
+                                                                  (BuildContext
+                                                                          context,
+                                                                      int i) {
+                                                                var chapter =
+                                                                    docs[i].get(
+                                                                        'chapter');
+                                                                var no = docs[i]
+                                                                    .get('no');
+                                                                var subPoint =
+                                                                    docs[i].get(
+                                                                        'subPoint');
+                                                                var text =
+                                                                    docs[i].get(
+                                                                        'text');
+                                                                var mark =
+                                                                    docs[i].get(
+                                                                        'mark');
 
-                                                              if (chapter ==
-                                                                  chapterNo) {
-                                                                return Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .stretch,
-                                                                  children: [
-                                                                    Padding(
-                                                                      padding: const EdgeInsets
-                                                                          .symmetric(
-                                                                          horizontal:
-                                                                              8),
-                                                                      child:
-                                                                          Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.spaceBetween,
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.end,
-                                                                        children: [
-                                                                          Expanded(
-                                                                            child:
-                                                                                Text(
-                                                                              '$no. ($subPoint) $text',
-                                                                              overflow: TextOverflow.ellipsis,
+                                                                if (chapter ==
+                                                                    chapterNo) {
+                                                                  return Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .stretch,
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .symmetric(
+                                                                            horizontal:
+                                                                                8),
+                                                                        child:
+                                                                            Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.spaceBetween,
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.end,
+                                                                          children: [
+                                                                            Expanded(
+                                                                              child: Text(
+                                                                                '$no. ($subPoint) $text',
+                                                                                overflow: TextOverflow.ellipsis,
+                                                                              ),
                                                                             ),
-                                                                          ),
-                                                                          const SizedBox(
-                                                                              width: 8),
-                                                                          Text(
-                                                                            mark,
-                                                                            style:
-                                                                                const TextStyle(
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontSize: 13,
+                                                                            const SizedBox(width: 8),
+                                                                            Text(
+                                                                              mark,
+                                                                              style: const TextStyle(
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontSize: 12,
+                                                                              ),
                                                                             ),
-                                                                          ),
-                                                                        ],
+                                                                          ],
+                                                                        ),
                                                                       ),
-                                                                    ),
 
-                                                                    if (i <
-                                                                            docs.length -
-                                                                                1 &&
-                                                                        docs[i + 1].get('chapter') ==
-                                                                            chapter)
-                                                                      const Divider(),
-                                                                    // Add a divider if next question has different number and same chapter
-                                                                  ],
-                                                                );
-                                                              } else {
-                                                                return const SizedBox
-                                                                    .shrink(); // Return an empty widget if chapter does not match
-                                                              }
-                                                            },
-                                                          );
-                                                        }),
+                                                                      // if (i < docs.length - 1 &&
+                                                                      //     docs[i + 1].get('chapter') ==
+                                                                      //         chapter )
+                                                                      // const Divider(),
+                                                                    ],
+                                                                  );
+                                                                } else {
+                                                                  return const SizedBox
+                                                                      .shrink(); // Return an empty widget if chapter does not match
+                                                                }
+                                                              },
+                                                            );
+                                                          }),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                          ],
+                                            ],
+                                          ),
                                         );
                                       }),
 

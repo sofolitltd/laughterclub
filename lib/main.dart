@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:laughterclub/appointment/appointment_screen.dart';
 
 import '/pdf_generator/add_screen.dart';
 import '/screen/admin/admin_payment.dart';
@@ -100,6 +101,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
         '/analysis': (context) => QuestionAnalysis(),
+        '/appointment': (context) => AppointmentScreen(),
       },
     );
   }
