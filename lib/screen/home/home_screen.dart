@@ -64,6 +64,7 @@ class HomeScreen extends StatelessWidget {
                     horizontal: 16,
                   ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // header
                 const HeaderSection(),
@@ -79,6 +80,56 @@ class HomeScreen extends StatelessWidget {
                 const TrainingSection(),
 
                 const SizedBox(height: 32),
+
+                //
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  child: Text(
+                    'Tools',
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          // letterSpacing: .5,
+                        ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Container(
+                  height: 100,
+                  child: ListView.separated(
+                    primary: true,
+                    padding: const EdgeInsets.only(bottom: 8),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 16),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: 1,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            "/certificates",
+                          );
+                        },
+                        child: Card(
+                          margin: EdgeInsets.zero,
+                          child: Container(
+                            width: 215,
+                            alignment: Alignment.centerLeft,
+                            padding: const EdgeInsets.all(10),
+                            child: const Text(
+                              'Create\nCertificate',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),

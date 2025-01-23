@@ -2,14 +2,16 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:laughterclub/appointment/appointment_screen.dart';
+import 'package:laughterclub/pdf_generator/certificate_list.dart';
 
-import '/pdf_generator/add_screen.dart';
+import '/pdf_generator/certificate_generate.dart';
 import '/screen/admin/admin_payment.dart';
 import '/screen/auth/login_screen.dart';
 import '/screen/auth/register_screen.dart';
 import '/screen/profile/profile_screen.dart';
 import 'analysis/question_analysis.dart';
 import 'firebase_options.dart';
+import 'pdf_generator/pdf_builder.dart';
 import 'screen/admin/admin_login_screen.dart';
 import 'screen/home/home_screen.dart';
 import 'screen/training/training_details.dart';
@@ -96,12 +98,14 @@ class MyApp extends StatelessWidget {
         '/': (context) => const HomeScreen(),
         '/admin': (context) => const AdminLoginScreen(),
         '/profile': (context) => const ProfileScreen(),
-        '/certificate': (context) => const AddScreen(),
+        '/certificates': (context) => const CertificateList(),
+        '/certificates/generate': (context) => const CertificateGenerate(),
+        '/builder': (context) => CertificateBuilder(),
         '/check': (context) => const AdminPayment(),
         '/login': (context) => const LoginScreen(),
         '/register': (context) => const RegisterScreen(),
-        '/analysis': (context) => QuestionAnalysis(),
-        '/appointment': (context) => AppointmentScreen(),
+        '/analysis': (context) => const QuestionAnalysis(),
+        '/appointment': (context) => const AppointmentScreen(),
       },
     );
   }

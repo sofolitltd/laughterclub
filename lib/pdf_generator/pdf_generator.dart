@@ -80,4 +80,55 @@ class PdfGenerator {
       ..setAttribute('download', fileName)
       ..click();
   }
+
+  // New function to create a single PDF with all certificates
+  static Future<void> createAllCertificates(
+      List<dynamic> names,
+      List<String> backgrounds,
+      List<double> positions,
+      List<String> trainingTitles) async {
+    // Create a new PDF document
+    final PdfDocument document = PdfDocument();
+    document.pageSettings.margins.all = 0;
+    document.pageSettings = PdfPageSettings(
+      PdfPageSize.a4,
+      PdfPageOrientation.landscape,
+    );
+
+    for (int i = 0; i < names.length; i++) {
+      String name = names[i];
+      String background = backgrounds[i];
+      double position = positions[i];
+      String trainingTitle = trainingTitles[i];
+
+      // Add a new page for each certificate
+      final PdfPage page = document.pages.add();
+
+      // Get the page size
+      final Size pageSize = page.getClientSize();
+
+      // Draw image from the internet
+      final Uint8List imageData = await _fetchImageData(background);
+      page.graphics.drawImage(PdfBitmap(imageData),
+          Rect.fromLTWH(0, 0, pageSize.width, pageSize.height));
+
+      // Create font
+      final PdfFont nameFont =
+          await _loadCustomFont('assets/fonts/PinyonScript-Regular.ttf', 50);
+
+      // Calculate the X position for the name text
+      double x = _calculateXPosition(name, nameFont, pageSize.width);
+      page.graphics.drawString(name, nameFont,
+          bounds: Rect.fromLTWH(x, position, 0, 0),
+          brush: PdfSolidBrush(PdfColor(20, 58, 86)));
+    }
+
+    // Save and launch the document
+    final List<int> bytes = await document.save();
+    // Dispose the document
+    document.dispose();
+
+    // Save and launch file
+    await _saveAndLaunchFile(bytes, 'All_Certificates.pdf');
+  }
 }
